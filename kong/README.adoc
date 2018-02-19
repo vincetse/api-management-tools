@@ -35,7 +35,7 @@ make down
 
 == Administration
 
-API management can be done via Kong's link:https://getkong.org/docs/0.12.x/admin-api/[Admin API], but various third party GUIs are available
+API management can be done via Kong's link:https://getkong.org/docs/0.12.x/admin-api/[Admin API], but various third party GUIs are available, as are automation options.
 
 === Kong Dashboard
 
@@ -50,6 +50,11 @@ docker run -p 8080:8080 --rm -it pgbi/kong-dashboard start --kong-url http://172
 
 link:https://pantsel.github.io/konga/[Konga] is a little more sophisticated than Kong Dashboard, and also offers an user management functionality that could be really useful for some.  I didn't set it up, but there is an online demo that you can play with.
 
+=== Ansible
+
+Kong can be automated with Ansible using the link:https://galaxy.ansible.com/wunzeco/kong/[wunzeco.kong] role.  The role is written not only to install Kong, but also to manage Kong APIs and consumers.  The demo here uses Ansible to provision the APIs and users.  Check out the link:ansible-playbook.yml[playbook] for this demo to see what it can do.
+
+
 == Thoughts
 
 . link:https://github.com/Kong/kong/blob/master/LICENSE[Apache 2.0 license].
@@ -62,7 +67,6 @@ link:https://pantsel.github.io/konga/[Konga] is a little more sophisticated than
 . HTTP header-based or query string-based API key auth.
 . Various GUIs available.
 . Various link:https://www.terraform.io[Terraform] providers available for automation.
-
 
 == References
 

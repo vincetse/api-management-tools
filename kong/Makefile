@@ -17,30 +17,22 @@ down:
 list_apis:
 	$(curl) $(api)/apis | jq .
 
-setup_user:
-	# add user
-	$(curl) $(api)/consumers/$(user) -X DELETE
-	$(curl) $(api)/consumers/ -X PUT --data 'username=$(user)'
-	$(curl) $(api)/consumers/$(user)/key-auth -X POST \
-		--data 'key=$(api_key)'
+define PROVISION_COMMANDS
+	ansible-galaxy install --force --role-file=/requirements.yml
+	ansible-playbook \
+		--extra-vars="kong_admin_api_url=http://172.17.0.1:8001" \
+		/playbook.yml
+endef
+export PROVISION_COMMANDS
+ansible:
+	$(eval pwd := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+	docker run --rm -it \
+		--volume "$(pwd)/ansible-requirements.yml:/requirements.yml:ro" \
+		--volume "$(pwd)/ansible-playbook.yml:/playbook.yml:ro" \
+		williamyeh/ansible:alpine3 \
+			/bin/sh -eux -c "$$PROVISION_COMMANDS"
 
-setup_service:
-	# delete the API if it exists
-	$(curl) $(api)/apis/$(service) -X DELETE
-	# upsert the API
-	$(curl) $(api)/apis -X PUT \
-		--data 'name=$(service)' \
-		--data 'uris=/$(service)' \
-		--data 'upstream_url=https://$(service).mockbin.org/requests'
-	# set up key auth
-	$(curl) $(api)/apis/$(service)/plugins -X POST \
-		--data 'name=key-auth' \
-		--data 'config.hide_credentials=true'
-
-setup:
-	$(MAKE) setup_service service=$(serv1)
-	$(MAKE) setup_service service=$(serv2)
-	$(MAKE) setup_user username=$(user)
+setup: ansible
 	# rate-limiting
 	$(curl) $(api)/plugins -X PUT \
 		--data 'name=rate-limiting' \
