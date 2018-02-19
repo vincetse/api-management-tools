@@ -1,0 +1,69 @@
+= Kong Demo
+Vince Tse <vincetse@users.noreply.github.com>
+:toc:
+:toc-title:
+
+A demo of how to use community edition of link:https://getkong.org/[Kong] to manage API services.  Inspired by link:https://github.com/mapzen/docker-apiaxle-demo[Mapzen's demo] (that is probably going to become unmaintained now that they are winding down their business).
+
+== Prerequisites
+
+. Docker
+. Docker Compose
+. GNU Make
+. Internet access to forward requests to link:https://mockbin.org[Mockbin].
+
+== Quick Start
+
+[source,bash]
+----
+# Start up the services
+make up
+
+# Set up APIs
+make setup
+
+# Curl services, which forwar requests to Mockbin
+make service-1
+make service-2
+
+# Multiple requests to test rate-limiting
+make requests service=service-1 nrequests=100
+
+# Shut down
+make down
+----
+
+== Administration
+
+API management can be done via Kong's link:https://getkong.org/docs/0.12.x/admin-api/[Admin API], but various third party GUIs are available
+
+=== Kong Dashboard
+
+I can't find a website for link:https://github.com/PGBI/kong-dashboard[Kong Dashboard], but it looks pretty slick once I started it after figuring out how to point it to the Kong admin API endpoint.
+
+[source,bash]
+----
+docker run -p 8080:8080 --rm -it pgbi/kong-dashboard start --kong-url http://172.17.0.1:8001
+----
+
+=== Konga
+
+link:https://pantsel.github.io/konga/[Konga] is a little more sophisticated than Kong Dashboard, and also offers an user management functionality that could be really useful for some.  I didn't set it up, but there is an online demo that you can play with.
+
+== Thoughts
+
+. link:https://github.com/Kong/kong/blob/master/LICENSE[Apache 2.0 license].
+. Supported by a company with Community-based and enterprise editions of the product.
+. Out-of-the-box installations for link:https://konghq.com/install/[multiple operating environments].
+. link:https://getkong.org/docs/0.12.x/clustering/[Scales out].
+. No API management CLI (that I found), and requires composing REST requests to manage API.
+. Extensible via link:https://konghq.com/plugins/[plugins], or even link:https://getkong.org/docs/0.12.x/plugin-development/[write your own plugin].
+. OAuth 2.0, though I haven't tried it.
+. HTTP header-based or query string-based API key auth.
+. Various GUIs available.
+. Various link:https://www.terraform.io[Terraform] providers available for automation.
+
+
+== References
+
+. link:https://getkong.org/[Kong]
