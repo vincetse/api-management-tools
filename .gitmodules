@@ -1,0 +1,3 @@
+[submodule "kong/docker-kong"]
+	path = kong/docker-kong
+	url = https://github.com/Kong/docker-kong.git

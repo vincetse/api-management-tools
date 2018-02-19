@@ -1,0 +1,60 @@
+# based off https://github.com/apiaxle/apiaxle/blob/develop/docker-compose.yml
+version: '2'
+services:
+  ################################################################################
+  # ApiAxle layer
+  ################################################################################
+  # ApiAxle management API (should be internal-only)
+  apiaxle-api:
+    image: apiaxle/apiaxle:1.15.1
+    ports:
+      - 3100:3100
+    depends_on:
+      - apiaxle-redis
+    environment:
+      REDIS_HOST: apiaxle-redis
+      REDIS_PORT: 6379
+      DEBUG_MODE: 'false'
+    command: ['api', '3100']
+
+  # Proxy for requests coming from Nginx, and implements rate-limiting, etc.
+  apiaxle-proxy:
+    image: apiaxle/apiaxle:1.15.1
+    depends_on:
+      - apiaxle-redis
+    environment:
+      REDIS_HOST: apiaxle-redis
+      REDIS_PORT: 6379
+      DEBUG_MODE: 'false'
+    command: ['proxy', '3000']
+
+  # Repl to make management easier, optionally, you can hit the management
+  # API directly, but this is easier for me.
+  apiaxle-repl:
+    image: apiaxle/apiaxle:1.15.1
+    depends_on:
+      - apiaxle-redis
+    environment:
+      REDIS_HOST: apiaxle-redis
+      REDIS_PORT: 6379
+      DEBUG_MODE: 'true'
+    command: ['repl']
+
+  # Persistent store for ApiAxle
+  apiaxle-redis:
+    image: redis:4.0.8
+    command: redis-server --appendonly yes
+    ports:
+      - "6379"
+
+  ################################################################################
+  # Internet-facing Nginx layer in front of ApiAxle
+  ################################################################################
+  nginx:
+    image: nginx:1.13-alpine
+    depends_on:
+      - apiaxle-proxy
+    ports:
+      - 8000:80
+    volumes:
+      - ./nginx-apiaxle-demo.conf:/etc/nginx/conf.d/default.conf:ro

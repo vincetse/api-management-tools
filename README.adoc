@@ -1,0 +1,10 @@
+= API Management Experiments
+Vince Tse <vincetse@users.noreply.github.com>
+:toc:
+:toc-title:
+
+Dabbling in various API management tools.
+
+== Rationale
+
+APIs are an important tool for companies today because link:https://hbr.org/2015/01/the-strategic-value-of-apis[they allow companies to grow businesses at unprecedented rates by sharing services with external firms].  There are a good range of API management tools out there today, and given the strategic nature of APIs, this is an exercise to develop some opinions about some open source API management tools.

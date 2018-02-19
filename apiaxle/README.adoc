@@ -1,0 +1,80 @@
+= ApiAxle Demo
+Vince Tse <vincetse@users.noreply.github.com>
+:toc:
+:toc-title:
+
+A demo of how to use link:http://apiaxle.com[ApiAxle] to manage API services.  Inspired by link:https://github.com/mapzen/docker-apiaxle-demo[Mapzen's demo] (that is probably going to become unmaintained now that they are winding down their business).
+
+== Prerequisites
+
+. Docker
+. Docker Compose
+. GNU Make
+. Internet access to forward requests to link:https://mockbin.org[Mockbin].
+
+== Quick Start
+
+[source,bash]
+----
+# Start up the services
+make up
+
+# Set up APIs
+make setup
+
+# Curl services, which forwar requests to Mockbin
+make service-1
+make service-2
+
+# Multiple requests to test rate-limiting
+make requests service=service-1 nrequests=100
+
+# Shut down
+make down
+----
+
+== Architecture
+
+----
+    +-------+
+    | Nginx |
+    +-------+
+        |
+        v
++---------------+      +-------+      +------------------------+
+| ApiAxle Proxy |----->| Redis |<-----| ApiAxle Management API |
++---------------+      +-------+      +------------------------+
+        |
+        |
+        |    +-----------+
+        +--->| Service 1 |
+        |    +-----------+
+        |
+        |    +-----------+
+        +--->| Service 2 |
+             +-----------+
+----
+
+== Administration
+
+API management can be done via the link:http://apiaxle.com/api.html[ApiAxle API], or using a link:https://www.npmjs.com/package/apiaxle-repl[repl] provided.  The repl can be scripted, and I did so by redirecting stdin (cos I didn't RTFM), but I had a few struggles cos the help page was missing a few things.
+
+
+== Thoughts
+
+. link:https://github.com/apiaxle/apiaxle/blob/develop/LICENSE.txt[GPL 3.0], which may be challenging for some to adopt, though a non-GPL license may be purchased.
+. Support subscriptions are link:http://apiaxle.com/about.html[available], though my suspicion is that it is provided by link:https://github.com/apiaxle/apiaxle/graphs/contributors[a small number of people].
+. Fairly link:https://github.com/apiaxle/apiaxle/commits/develop[inactive development].
+. Pretty simple to get started, probably suffices for many.
+. A link:https://www.npmjs.com/package/apiaxle-repl[repl] is available, though I struggled a little with some commands despite the help page.
+. No administrative GUI that I found.
+. API key is provided in query string, which may present a problem if the upstreams do any redirects that don't have the API key in the query string.
+
+
+== References
+
+. link:https://mapzen.com/blog/apiaxle/[How we manage our APIs with ApiAxle]
+. link:https://github.com/mapzen/docker-apiaxle-demo[mapzen/docker-apiaxle-demo]
+. link:http://apiaxle.com/docs.html[ApiAxle documentation]
+. link:https://www.digitalocean.com/community/tutorials/understanding-nginx-http-proxying-load-balancing-buffering-and-caching[Understanding Nginx HTTP Proxying, Load Balancing, Buffering, and Caching]
+. link:http://perldoc.perl.org/perlre.html[Perlre]
