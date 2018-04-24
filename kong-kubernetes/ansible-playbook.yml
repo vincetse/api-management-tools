@@ -1,0 +1,48 @@
+---
+# Based off the example in https://github.com/wunzeco/ansible-kong
+- name: "Kong API provisioning"
+  hosts: "localhost"
+  connection: "local"
+  vars:
+    kong_admin_api_url: ""
+  roles:
+
+  ################################################################################
+  # API provisioning
+  ################################################################################
+  # service-1
+  - role: "wunzeco.kong"
+    kong_task: "api"
+    kong_api_obj_name: "service-1"
+    kong_api_obj_upstream_url: "https://service-1.mockbin.org/requests"
+    kong_api_obj_uris: "/service-1"
+    kong_delete_api_obj: false
+    kong_api_obj_plugins:
+    - name: "key-auth"
+      config_parameters:
+      - "config.hide_credentials=true"
+
+  # service-2
+  - role: "wunzeco.kong"
+    kong_task: "api"
+    kong_api_obj_name: "service-2"
+    kong_api_obj_upstream_url: "https://service-2.mockbin.com/requests"
+    kong_api_obj_uris: "/service-2"
+    kong_delete_api_obj: false
+    kong_api_obj_plugins:
+    - name: "key-auth"
+      config_parameters:
+      - "config.hide_credentials=true"
+
+  ################################################################################
+  # Consumer provisioning
+  ################################################################################
+  # user1
+  - role: "wunzeco.kong"
+    kong_task: "consumer"
+    kong_consumer_obj_username: "user1"
+    kong_delete_consumer_obj: false
+    kong_consumer_obj_auth_creds:
+    - plugin: "key-auth"
+      parameters:
+        key: "28cfebcc-45d9-11e8-a501-002590aa11ec"
